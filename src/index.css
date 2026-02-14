@@ -1,0 +1,247 @@
+@import url("https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap");
+
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+:root {
+  --brand-orange: #ea592d;
+  --brand-coral: #ff6b4a;
+  --brand-blue: #334295;
+}
+body {
+  font-family: "Sora", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+/* Gradient mesh animation for camera preview placeholder */
+@keyframes gradientMesh {
+  0% {
+    background-position: 0% 50%;
+  }
+  25% {
+    background-position: 100% 0%;
+  }
+  50% {
+    background-position: 100% 100%;
+  }
+  75% {
+    background-position: 0% 100%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+.gradient-mesh {
+  background: linear-gradient(
+    -45deg,
+    #ea592d,
+    #ff6b4a,
+    #7c3aed,
+    #334295,
+    #ea592d,
+    #ff8a65
+  );
+  background-size: 400% 400%;
+  animation: gradientMesh 8s ease infinite;
+}
+/* Shimmer effect for loading text */
+@keyframes shimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+.text-shimmer {
+  background: linear-gradient(
+    90deg,
+    #9ca3af 0%,
+    #ea592d 25%,
+    #334295 50%,
+    #ea592d 75%,
+    #9ca3af 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 3s linear infinite;
+}
+/* Rotating gradient ring for avatar */
+@keyframes rotateGradient {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+.gradient-ring {
+  background: conic-gradient(
+    from 0deg,
+    #ea592d,
+    #ff6b4a,
+    #7c3aed,
+    #334295,
+    #ea592d
+  );
+  animation: rotateGradient 3s linear infinite;
+}
+/* Pulse glow for PiP */
+@keyframes pipGlow {
+  0%,
+  100% {
+    box-shadow: 0 0 16px 3px rgba(234, 89, 45, 0.25),
+      0 0 32px 6px rgba(51, 66, 149, 0.12);
+  }
+  50% {
+    box-shadow: 0 0 24px 6px rgba(234, 89, 45, 0.4),
+      0 0 48px 12px rgba(51, 66, 149, 0.25);
+  }
+}
+.pip-glow {
+  animation: pipGlow 2.5s ease-in-out infinite;
+}
+/* Gradient border utility */
+.gradient-border-top {
+  position: relative;
+}
+.gradient-border-top::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #ea592d, #7c3aed, #334295);
+  border-radius: 16px 16px 0 0;
+}
+
+/* =====================================================
+   STREAM VIDEO SDK - MOBILE RESPONSIVE OVERRIDES
+   ===================================================== */
+
+/* Mobile Video Layout - Full screen optimization */
+@media (max-width: 768px) {
+  /* Force full viewport coverage */
+  .mobile-video-layout {
+    width: 100vw !important;
+    height: 100dvh !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    z-index: 50;
+  }
+
+  /* Override Stream SDK participant view for mobile */
+  .str-video__participant-view {
+    width: 100% !important;
+    height: 100% !important;
+    min-width: 100vw !important;
+    min-height: 100dvh !important;
+  }
+
+  /* Force video to cover entire container */
+  .str-video__participant-view video {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    object-position: center !important;
+  }
+
+  /* Hide participant bar in mobile SpeakerLayout */
+  .str-video__speaker-layout__participants-bar,
+  .str-video__speaker-layout__participants-bar-container {
+    display: none !important;
+  }
+
+  /* Make spotlight view take full screen */
+  .str-video__speaker-layout__spotlight,
+  .str-video__speaker-layout__spotlight-container {
+    width: 100vw !important;
+    height: 100dvh !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+  }
+
+  /* Remove padding and margins in mobile view */
+  .str-video__speaker-layout {
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100vw !important;
+    height: 100dvh !important;
+  }
+
+  /* Ensure call controls are visible and properly positioned */
+  .str-video__call-controls {
+    position: fixed !important;
+    bottom: max(24px, env(safe-area-inset-bottom)) !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    z-index: 100 !important;
+    background: rgba(0, 0, 0, 0.6) !important;
+    backdrop-filter: blur(10px) !important;
+    border-radius: 24px !important;
+    padding: 8px 16px !important;
+  }
+
+  /* Video call screen container adjustments */
+  .str-video {
+    width: 100vw !important;
+    height: 100dvh !important;
+    overflow: hidden !important;
+  }
+}
+
+/* Small mobile devices */
+@media (max-width: 480px) {
+  .str-video__participant-view video {
+    object-fit: cover !important;
+  }
+
+  /* Ensure participant name overlay is readable */
+  .mobile-video-layout .participant-name-overlay {
+    font-size: 14px !important;
+    padding: 6px 12px !important;
+  }
+}
+
+/* Safe area insets for notched devices */
+@supports (padding-top: env(safe-area-inset-top)) {
+  .mobile-video-layout {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+}
+
+/* Prevent scrolling on mobile during video call */
+@media (max-width: 768px) {
+  body:has(.mobile-video-layout) {
+    overflow: hidden !important;
+    position: fixed !important;
+    width: 100% !important;
+    height: 100% !important;
+  }
+}
+
+/* =====================================================
+   UTILITY CLASSES
+   ===================================================== */
+
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.safe-area-top {
+  padding-top: env(safe-area-inset-top);
+}
+
+/* Ensure controls don't overlap with safe areas */
+.safe-area-inset {
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}

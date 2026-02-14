@@ -1,0 +1,201 @@
+react-dom-client.development.js:28004 Download the React DevTools for a better development experience: https://react.dev/link/react-devtools
+App.tsx?t=1768511353411:78  Uncaught ReferenceError: setTokenReadyCallback is not defined
+    at App.tsx?t=1768511353411:78:9
+    at mountStateImpl (react-dom-client.development.js:8268:24)
+    at mountState (react-dom-client.development.js:8289:22)
+    at Object.useState (react-dom-client.development.js:26243:18)
+    at exports.useState (react.development.js:1263:34)
+    at App (App.tsx?t=1768511353411:77:5)
+    at Object.react_stack_bottom_frame (react-dom-client.development.js:25904:20)
+    at renderWithHooks (react-dom-client.development.js:7662:22)
+    at updateFunctionComponent (react-dom-client.development.js:10166:19)
+    at beginWork (react-dom-client.development.js:11778:18)
+(anonymous) @ App.tsx?t=1768511353411:78
+mountStateImpl @ react-dom-client.development.js:8268
+mountState @ react-dom-client.development.js:8289
+useState @ react-dom-client.development.js:26243
+exports.useState @ react.development.js:1263
+App @ App.tsx?t=1768511353411:77
+react_stack_bottom_frame @ react-dom-client.development.js:25904
+renderWithHooks @ react-dom-client.development.js:7662
+updateFunctionComponent @ react-dom-client.development.js:10166
+beginWork @ react-dom-client.development.js:11778
+runWithFiberInDEV @ react-dom-client.development.js:871
+performUnitOfWork @ react-dom-client.development.js:17641
+workLoopSync @ react-dom-client.development.js:17469
+renderRootSync @ react-dom-client.development.js:17450
+performWorkOnRoot @ react-dom-client.development.js:16583
+performWorkOnRootViaSchedulerTask @ react-dom-client.development.js:18957
+performWorkUntilDeadline @ scheduler.development.js:45
+<App>
+exports.jsxDEV @ react-jsx-dev-runtime.development.js:335
+(anonymous) @ main.tsx:8
+main.tsx:8  An error occurred in the <App> component.
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://react.dev/link/error-boundaries to learn more about error boundaries.
+
+defaultOnUncaughtError @ react-dom-client.development.js:9362
+logUncaughtError @ react-dom-client.development.js:9431
+runWithFiberInDEV @ react-dom-client.development.js:871
+lane.callback @ react-dom-client.development.js:9461
+callCallback @ react-dom-client.development.js:7423
+commitCallbacks @ react-dom-client.development.js:7443
+runWithFiberInDEV @ react-dom-client.development.js:874
+commitLayoutEffectOnFiber @ react-dom-client.development.js:14047
+flushLayoutEffects @ react-dom-client.development.js:18138
+commitRoot @ react-dom-client.development.js:17954
+commitRootWhenReady @ react-dom-client.development.js:16824
+performWorkOnRoot @ react-dom-client.development.js:16722
+performWorkOnRootViaSchedulerTask @ react-dom-client.development.js:18957
+performWorkUntilDeadline @ scheduler.development.js:45
+<App>
+exports.jsxDEV @ react-jsx-dev-runtime.development.js:335
+(anonymous) @ main.tsx:8
+[NEW] Explain Console errors by using Copilot in Edge: click
+         
+         to explain an error. 
+        Learn more
+        Don't show again
+App.tsx?t=1768511357823:81  [client]: A StreamVideoClient already exists for caller; Prefer using getOrCreateInstance method
+logToConsole2 @ logger.ts:35
+(anonymous) @ index.ts:89
+registerClientInstance @ StreamVideoClient.ts:156
+_StreamVideoClient @ StreamVideoClient.ts:116
+(anonymous) @ App.tsx?t=1768511357823:81
+Promise.then
+(anonymous) @ App.tsx?t=1768511357823:80
+mountStateImpl @ react-dom-client.development.js:8272
+mountState @ react-dom-client.development.js:8289
+useState @ react-dom-client.development.js:26243
+exports.useState @ react.development.js:1263
+App @ App.tsx?t=1768511357823:79
+react_stack_bottom_frame @ react-dom-client.development.js:25904
+renderWithHooks @ react-dom-client.development.js:7662
+updateFunctionComponent @ react-dom-client.development.js:10166
+beginWork @ react-dom-client.development.js:11778
+runWithFiberInDEV @ react-dom-client.development.js:871
+performUnitOfWork @ react-dom-client.development.js:17641
+workLoopSync @ react-dom-client.development.js:17469
+renderRootSync @ react-dom-client.development.js:17450
+performWorkOnRoot @ react-dom-client.development.js:16504
+performSyncWorkOnRoot @ react-dom-client.development.js:18972
+flushSyncWorkAcrossRoots_impl @ react-dom-client.development.js:18814
+flushSyncWork$1 @ react-dom-client.development.js:16898
+scheduleRoot @ react-dom-client.development.js:101
+(anonymous) @ @react-refresh:208
+performReactRefresh @ @react-refresh:190
+(anonymous) @ @react-refresh:604
+<App>
+exports.jsxDEV @ react-jsx-dev-runtime.development.js:335
+(anonymous) @ main.tsx:8
+App.tsx:69  [video manager]: Setting direction is not supported on this device
+logToConsole2 @ logger.ts:35
+(anonymous) @ index.ts:89
+selectDirection @ CameraManager.ts:37
+apply @ CameraManager.ts:129
+await in apply
+Call.applyDeviceConfig @ Call.ts:2679
+Call.doJoin @ Call.ts:1115
+await in Call.doJoin
+Call.join @ Call.ts:906
+await in Call.join
+startCall @ App.tsx:69
+executeDispatch @ react-dom-client.development.js:19116
+runWithFiberInDEV @ react-dom-client.development.js:871
+processDispatchQueue @ react-dom-client.development.js:19166
+(anonymous) @ react-dom-client.development.js:19767
+batchedUpdates$1 @ react-dom-client.development.js:3255
+dispatchEventForPluginEventSystem @ react-dom-client.development.js:19320
+dispatchEvent @ react-dom-client.development.js:23585
+dispatchDiscreteEvent @ react-dom-client.development.js:23553
+<button>
+exports.jsxDEV @ react-jsx-dev-runtime.development.js:335
+App @ App.tsx?t=1768511357823:146
+react_stack_bottom_frame @ react-dom-client.development.js:25904
+renderWithHooksAgain @ react-dom-client.development.js:7762
+renderWithHooks @ react-dom-client.development.js:7674
+updateFunctionComponent @ react-dom-client.development.js:10166
+beginWork @ react-dom-client.development.js:11778
+runWithFiberInDEV @ react-dom-client.development.js:871
+performUnitOfWork @ react-dom-client.development.js:17641
+workLoopSync @ react-dom-client.development.js:17469
+renderRootSync @ react-dom-client.development.js:17450
+performWorkOnRoot @ react-dom-client.development.js:16504
+performSyncWorkOnRoot @ react-dom-client.development.js:18972
+flushSyncWorkAcrossRoots_impl @ react-dom-client.development.js:18814
+flushSyncWork$1 @ react-dom-client.development.js:16898
+scheduleRoot @ react-dom-client.development.js:101
+(anonymous) @ @react-refresh:208
+performReactRefresh @ @react-refresh:190
+(anonymous) @ @react-refresh:604
+<App>
+exports.jsxDEV @ react-jsx-dev-runtime.development.js:335
+(anonymous) @ main.tsx:8
+App.tsx:26  You are using useCallState() outside a Call context. Please wrap your component in <StreamCall /> and provide a "call" instance.
+useCallState @ callStateHooks.ts:46
+useCallCallingState @ callStateHooks.ts:227
+LiveCallPanel @ App.tsx:26
+react_stack_bottom_frame @ react-dom-client.development.js:25904
+renderWithHooks @ react-dom-client.development.js:7662
+updateFunctionComponent @ react-dom-client.development.js:10166
+beginWork @ react-dom-client.development.js:11778
+runWithFiberInDEV @ react-dom-client.development.js:871
+performUnitOfWork @ react-dom-client.development.js:17641
+workLoopSync @ react-dom-client.development.js:17469
+renderRootSync @ react-dom-client.development.js:17450
+performWorkOnRoot @ react-dom-client.development.js:16504
+performWorkOnRootViaSchedulerTask @ react-dom-client.development.js:18957
+performWorkUntilDeadline @ scheduler.development.js:45
+<LiveCallPanel>
+exports.jsxDEV @ react-jsx-dev-runtime.development.js:335
+App @ App.tsx:107
+react_stack_bottom_frame @ react-dom-client.development.js:25904
+renderWithHooksAgain @ react-dom-client.development.js:7762
+renderWithHooks @ react-dom-client.development.js:7674
+updateFunctionComponent @ react-dom-client.development.js:10166
+beginWork @ react-dom-client.development.js:11778
+runWithFiberInDEV @ react-dom-client.development.js:871
+performUnitOfWork @ react-dom-client.development.js:17641
+workLoopSync @ react-dom-client.development.js:17469
+renderRootSync @ react-dom-client.development.js:17450
+performWorkOnRoot @ react-dom-client.development.js:16504
+performWorkOnRootViaSchedulerTask @ react-dom-client.development.js:18957
+performWorkUntilDeadline @ scheduler.development.js:45
+<App>
+exports.jsxDEV @ react-jsx-dev-runtime.development.js:335
+(anonymous) @ main.tsx:8
+App.tsx:26  You are using useCallState() outside a Call context. Please wrap your component in <StreamCall /> and provide a "call" instance.
+useCallState @ callStateHooks.ts:46
+useCallCallingState @ callStateHooks.ts:227
+LiveCallPanel @ App.tsx:26
+react_stack_bottom_frame @ react-dom-client.development.js:25904
+renderWithHooksAgain @ react-dom-client.development.js:7762
+renderWithHooks @ react-dom-client.development.js:7674
+updateFunctionComponent @ react-dom-client.development.js:10166
+beginWork @ react-dom-client.development.js:11778
+runWithFiberInDEV @ react-dom-client.development.js:871
+performUnitOfWork @ react-dom-client.development.js:17641
+workLoopSync @ react-dom-client.development.js:17469
+renderRootSync @ react-dom-client.development.js:17450
+performWorkOnRoot @ react-dom-client.development.js:16504
+performWorkOnRootViaSchedulerTask @ react-dom-client.development.js:18957
+performWorkUntilDeadline @ scheduler.development.js:45
+<LiveCallPanel>
+exports.jsxDEV @ react-jsx-dev-runtime.development.js:335
+App @ App.tsx:107
+react_stack_bottom_frame @ react-dom-client.development.js:25904
+renderWithHooksAgain @ react-dom-client.development.js:7762
+renderWithHooks @ react-dom-client.development.js:7674
+updateFunctionComponent @ react-dom-client.development.js:10166
+beginWork @ react-dom-client.development.js:11778
+runWithFiberInDEV @ react-dom-client.development.js:871
+performUnitOfWork @ react-dom-client.development.js:17641
+workLoopSync @ react-dom-client.development.js:17469
+renderRootSync @ react-dom-client.development.js:17450
+performWorkOnRoot @ react-dom-client.development.js:16504
+performWorkOnRootViaSchedulerTask @ react-dom-client.development.js:18957
+performWorkUntilDeadline @ scheduler.development.js:45
+<App>
+exports.jsxDEV @ react-jsx-dev-runtime.development.js:335
+(anonymous) @ main.tsx:8

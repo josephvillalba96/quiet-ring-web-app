@@ -1,0 +1,9 @@
+    "idProcess": "8907646c-a189-40ad-96f8-7454fa31aef6",
+    "date": "2026-02-13T23:10:50.014841800",
+    "errors": [
+        {
+            "code": "ERR01",
+            "descCode": "La URL de la imagen es requerida"
+        }
+    ]
+}

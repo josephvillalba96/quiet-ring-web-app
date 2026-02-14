@@ -1,0 +1,1791 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Quiet Ring API",
+    "description": "API para el servicio de timbre inteligente Quiet Ring. Incluye autenticación con OTP, gestión de timbres, sesiones anónimas y perfiles de usuario.",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Quiet Ring Team"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080",
+      "description": "Servidor de desarrollo local"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Autenticación",
+      "description": "Endpoints para autenticación y gestión de sesiones"
+    },
+    {
+      "name": "OTP",
+      "description": "Endpoints para generación y validación de OTP"
+    },
+    {
+      "name": "Timbres",
+      "description": "Endpoints para gestión de timbres (requiere autenticación)"
+    },
+    {
+      "name": "Timbres Públicos",
+      "description": "Endpoints públicos para información de timbres"
+    },
+    {
+      "name": "Sesiones Anónimas",
+      "description": "Endpoints para gestión de sesiones anónimas de visitantes"
+    },
+    {
+      "name": "Perfil de Usuario",
+      "description": "Endpoints para gestión del perfil de usuario"
+    },
+    {
+      "name": "Media",
+      "description": "Endpoints para subida y gestión de archivos multimedia"
+    },
+    {
+      "name": "Llamadas",
+      "description": "Endpoints para registro y gestión de llamadas"
+    }
+  ],
+  "paths": {
+    "/otp/generate": {
+      "post": {
+        "tags": ["OTP"],
+        "summary": "Generar código OTP",
+        "description": "Genera y envía un código OTP al número de teléfono especificado",
+        "operationId": "generateOtp",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestGenerateOtp"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OTP generado exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseSuccessfulDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "408": {
+            "$ref": "#/components/responses/Timeout"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/otp/validate": {
+      "post": {
+        "tags": ["OTP"],
+        "summary": "Validar código OTP",
+        "description": "Valida el código OTP y retorna un token JWT para autenticación",
+        "operationId": "validateOtp",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestValidateOtp"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OTP validado exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "408": {
+            "$ref": "#/components/responses/Timeout"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/otp/valid": {
+      "post": {
+        "tags": ["OTP"],
+        "summary": "Verificar OTP (alternativo)",
+        "description": "Endpoint alternativo para verificación de OTP",
+        "operationId": "validOtp",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestGenerateOtp"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Verificación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/stream-jwt": {
+      "post": {
+        "tags": ["Autenticación"],
+        "summary": "Obtener token JWT para streaming",
+        "description": "Genera un token JWT específico para servicios de streaming",
+        "operationId": "getStreamJwt",
+        "security": [{ "BearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestStreamJwt"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Token generado exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseSuccessfulDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "408": {
+            "$ref": "#/components/responses/Timeout"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/api/auth/logout": {
+      "post": {
+        "tags": ["Autenticación"],
+        "summary": "Cerrar sesión",
+        "description": "Invalida el token JWT actual",
+        "operationId": "logout",
+        "security": [{ "BearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LogoutRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Sesión cerrada exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseSuccessfulDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "408": {
+            "$ref": "#/components/responses/Timeout"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/api/doorbells": {
+      "get": {
+        "tags": ["Timbres"],
+        "summary": "Obtener timbres del usuario",
+        "description": "Retorna la lista de timbres asociados al usuario autenticado",
+        "operationId": "getDoorbells",
+        "security": [{ "BearerAuth": [] }],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Request"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Lista de timbres obtenida exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseSuccessfulDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "408": {
+            "$ref": "#/components/responses/Timeout"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "post": {
+        "tags": ["Timbres"],
+        "summary": "Crear nuevo timbre",
+        "description": "Crea un nuevo timbre y opcionalmente agrega miembros",
+        "operationId": "createDoorbell",
+        "security": [{ "BearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DoorbellRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Timbre creado exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DoorbellCreationResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "408": {
+            "$ref": "#/components/responses/Timeout"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/api/doorbells/{id}": {
+      "delete": {
+        "tags": ["Timbres"],
+        "summary": "Eliminar timbre",
+        "description": "Elimina un timbre específico por su ID",
+        "operationId": "deleteDoorbell",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "ID del timbre"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Request"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Timbre eliminado exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseSuccessfulDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "408": {
+            "$ref": "#/components/responses/Timeout"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/api/doorbells/{id}/members": {
+      "post": {
+        "tags": ["Timbres"],
+        "summary": "Agregar miembros al timbre",
+        "description": "Agrega miembros a un timbre existente usando números de teléfono",
+        "operationId": "addMembers",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "ID del timbre"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddMembersRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Miembros agregados exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseSuccessfulDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "408": {
+            "$ref": "#/components/responses/Timeout"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Timbres"],
+        "summary": "Eliminar miembro del timbre",
+        "description": "Elimina un miembro específico del timbre",
+        "operationId": "removeMember",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "ID del timbre"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RemoveMemberRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Miembro eliminado exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseSuccessfulDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "408": {
+            "$ref": "#/components/responses/Timeout"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/api/doorbells/{id}/status": {
+      "put": {
+        "tags": ["Timbres"],
+        "summary": "Actualizar estado del timbre",
+        "description": "Activa o desactiva un timbre",
+        "operationId": "updateDoorbellStatus",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "ID del timbre"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DoorbellStatusRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Estado actualizado exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseSuccessfulDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "408": {
+            "$ref": "#/components/responses/Timeout"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/public/doorbells/{code}": {
+      "get": {
+        "tags": ["Timbres Públicos"],
+        "summary": "Obtener información pública del timbre",
+        "description": "Retorna información pública de un timbre usando su código único (no requiere autenticación)",
+        "operationId": "getPublicDoorbellInfo",
+        "parameters": [
+          {
+            "name": "code",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Código único del timbre"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Información del timbre obtenida exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseSuccessfulDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "408": {
+            "$ref": "#/components/responses/Timeout"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/api/anonymous-sessions": {
+      "post": {
+        "tags": ["Sesiones Anónimas"],
+        "summary": "Crear sesión anónima (completa)",
+        "description": "Crea una sesión anónima completa con foto incluida (método legacy). Endpoint público, no requiere autenticación previa.",
+        "operationId": "createAnonymousSession",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAnonymousSessionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Sesión anónima creada exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnonymousSessionResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "408": {
+            "$ref": "#/components/responses/Timeout"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/api/anonymous-sessions/iniciar": {
+      "post": {
+        "tags": ["Sesiones Anónimas"],
+        "summary": "Iniciar sesión anónima (Paso 1)",
+        "description": "Paso 1 del flujo de sesión anónima: Crea la sesión y genera un token JWT temporal. Endpoint público, no requiere autenticación previa. Usa el token JWT retornado en los headers Authorization para los siguientes pasos.",
+        "operationId": "iniciarSesionAnonima",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IniciarSesionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Sesión iniciada exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnonymousSessionCreationResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "408": {
+            "$ref": "#/components/responses/Timeout"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/api/anonymous-sessions/upload-mediafile/{sessionId}": {
+      "put": {
+        "tags": ["Sesiones Anónimas"],
+        "summary": "Actualizar foto de sesión (Paso 3)",
+        "description": "Paso 3 del flujo: Actualiza la sesión anónima con la URL de la foto subida. Requiere el token JWT temporal obtenido del endpoint POST /iniciar.",
+        "operationId": "actualizarFotoSesion",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "sessionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID de la sesión anónima (UUID)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ActualizarFotoRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Foto actualizada exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseSuccessfulDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "408": {
+            "$ref": "#/components/responses/Timeout"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/api/user/profile": {
+      "get": {
+        "tags": ["Perfil de Usuario"],
+        "summary": "Obtener perfil de usuario",
+        "description": "Retorna la información del perfil del usuario autenticado",
+        "operationId": "getUserProfile",
+        "security": [{ "BearerAuth": [] }],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Request"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Perfil obtenido exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserProfileResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "408": {
+            "$ref": "#/components/responses/Timeout"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "post": {
+        "tags": ["Perfil de Usuario"],
+        "summary": "Crear perfil de usuario",
+        "description": "Crea un nuevo perfil para el usuario autenticado",
+        "operationId": "createUserProfile",
+        "security": [{ "BearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserProfileCreateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Perfil creado exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseSuccessfulDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "408": {
+            "$ref": "#/components/responses/Timeout"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "put": {
+        "tags": ["Perfil de Usuario"],
+        "summary": "Actualizar perfil de usuario",
+        "description": "Actualiza la información del perfil del usuario autenticado",
+        "operationId": "updateUserProfile",
+        "security": [{ "BearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserProfileUpdateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Perfil actualizado exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseSuccessfulDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "408": {
+            "$ref": "#/components/responses/Timeout"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/api/user/profile/avatar": {
+      "delete": {
+        "tags": ["Perfil de Usuario"],
+        "summary": "Eliminar avatar del usuario",
+        "description": "Elimina la foto de perfil del usuario autenticado",
+        "operationId": "deleteUserAvatar",
+        "security": [{ "BearerAuth": [] }],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Request"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Avatar eliminado exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseSuccessfulDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "408": {
+            "$ref": "#/components/responses/Timeout"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/api/media/upload": {
+      "post": {
+        "tags": ["Media"],
+        "summary": "Subir archivo",
+        "description": "Sube un archivo multimedia y retorna su URL",
+        "operationId": "uploadFile",
+        "security": [{ "BearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Archivo a subir"
+                  },
+                  "idProcess": {
+                    "type": "string",
+                    "description": "ID del proceso"
+                  }
+                },
+                "required": ["file", "idProcess"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Archivo subido exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadFileResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "408": {
+            "$ref": "#/components/responses/Timeout"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/api/media/files/{fileId}": {
+      "get": {
+        "tags": ["Media"],
+        "summary": "Obtener archivo",
+        "description": "Descarga un archivo por su ID",
+        "operationId": "getFile",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "fileId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID del archivo"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Archivo obtenido exitosamente",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "put": {
+        "tags": ["Media"],
+        "summary": "Actualizar archivo",
+        "description": "Actualiza un archivo existente",
+        "operationId": "updateFile",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "fileId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID del archivo"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Nuevo archivo"
+                  },
+                  "idProcess": {
+                    "type": "string",
+                    "description": "ID del proceso"
+                  }
+                },
+                "required": ["file", "idProcess"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Archivo actualizado exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseSuccessfulDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "408": {
+            "$ref": "#/components/responses/Timeout"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/call/register": {
+      "post": {
+        "tags": ["Llamadas"],
+        "summary": "Registrar llamada",
+        "description": "Registra una nueva llamada en el sistema",
+        "operationId": "registerCall",
+        "security": [{ "BearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestCall"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Llamada registrada exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseSuccessfulDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "408": {
+            "$ref": "#/components/responses/Timeout"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/call/obtain": {
+      "post": {
+        "tags": ["Llamadas"],
+        "summary": "Obtener llamadas",
+        "description": "Obtiene el historial de llamadas del usuario",
+        "operationId": "obtainCalls",
+        "security": [{ "BearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Request"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Llamadas obtenidas exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseSuccessfulDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "408": {
+            "$ref": "#/components/responses/Timeout"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Token JWT obtenido del endpoint /otp/validate"
+      }
+    },
+    "schemas": {
+      "Request": {
+        "type": "object",
+        "properties": {
+          "idProcess": {
+            "type": "string",
+            "description": "Identificador único del proceso",
+            "example": "PROC-12345"
+          },
+          "deviceInfo": {
+            "$ref": "#/components/schemas/DeviceInfo"
+          }
+        },
+        "required": ["idProcess"]
+      },
+      "DeviceInfo": {
+        "type": "object",
+        "properties": {
+          "ip": {
+            "type": "string",
+            "example": "192.168.1.1"
+          },
+          "mobile": {
+            "type": "string",
+            "example": "+573001234567"
+          },
+          "mac": {
+            "type": "string",
+            "example": "AA:BB:CC:DD:EE:FF"
+          }
+        }
+      },
+      "RequestGenerateOtp": {
+        "allOf": [
+          { "$ref": "#/components/schemas/Request" },
+          {
+            "type": "object",
+            "properties": {
+              "cellPhoneNumber": {
+                "type": "string",
+                "description": "Número de teléfono",
+                "example": "3001234567"
+              },
+              "indicative": {
+                "type": "string",
+                "description": "Indicativo del país",
+                "example": "+57"
+              }
+            },
+            "required": ["cellPhoneNumber", "indicative"]
+          }
+        ]
+      },
+      "RequestValidateOtp": {
+        "allOf": [
+          { "$ref": "#/components/schemas/RequestGenerateOtp" },
+          {
+            "type": "object",
+            "properties": {
+              "otp": {
+                "type": "string",
+                "description": "Código OTP recibido",
+                "example": "123456"
+              }
+            },
+            "required": ["otp"]
+          }
+        ]
+      },
+      "RequestStreamJwt": {
+        "allOf": [
+          { "$ref": "#/components/schemas/Request" },
+          {
+            "type": "object",
+            "properties": {
+              "userId": {
+                "type": "string",
+                "description": "ID del usuario para el token de streaming"
+              }
+            },
+            "required": ["userId"]
+          }
+        ]
+      },
+      "LogoutRequest": {
+        "allOf": [
+          { "$ref": "#/components/schemas/Request" },
+          {
+            "type": "object",
+            "properties": {
+              "deviceInfo": {
+                "type": "string"
+              }
+            }
+          }
+        ]
+      },
+      "RequestCall": {
+        "allOf": [
+          { "$ref": "#/components/schemas/Request" },
+          {
+            "type": "object",
+            "properties": {
+              "call": {
+                "$ref": "#/components/schemas/CallInfo"
+              }
+            },
+            "required": ["call"]
+          }
+        ]
+      },
+      "CallInfo": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "idUserDestinity": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "status": {
+            "type": "string"
+          },
+          "duration": {
+            "type": "string"
+          },
+          "mac": {
+            "type": "string"
+          },
+          "ip": {
+            "type": "string"
+          },
+          "idRing": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "nameOrigen": {
+            "type": "string"
+          }
+        }
+      },
+      "DoorbellRequest": {
+        "allOf": [
+          { "$ref": "#/components/schemas/Request" },
+          {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Nombre del timbre",
+                "example": "Timbre Principal"
+              },
+              "callType": {
+                "type": "string",
+                "description": "Tipo de llamada (audio/video)",
+                "example": "video"
+              },
+              "contacts": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Lista de números de contacto",
+                "example": ["3001234567", "3009876543"]
+              }
+            },
+            "required": ["name", "callType"]
+          }
+        ]
+      },
+      "DoorbellStatusRequest": {
+        "allOf": [
+          { "$ref": "#/components/schemas/Request" },
+          {
+            "type": "object",
+            "properties": {
+              "isActive": {
+                "type": "boolean",
+                "description": "Estado activo/inactivo del timbre"
+              }
+            },
+            "required": ["isActive"]
+          }
+        ]
+      },
+      "AddMembersRequest": {
+        "allOf": [
+          { "$ref": "#/components/schemas/Request" },
+          {
+            "type": "object",
+            "properties": {
+              "phones": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Lista de números de teléfono"
+              }
+            },
+            "required": ["phones"]
+          }
+        ]
+      },
+      "RemoveMemberRequest": {
+        "allOf": [
+          { "$ref": "#/components/schemas/Request" },
+          {
+            "type": "object",
+            "properties": {
+              "userId": {
+                "type": "integer",
+                "format": "int64",
+                "description": "ID del usuario a eliminar"
+              }
+            },
+            "required": ["userId"]
+          }
+        ]
+      },
+      "CreateAnonymousSessionRequest": {
+        "allOf": [
+          { "$ref": "#/components/schemas/Request" },
+          {
+            "type": "object",
+            "properties": {
+              "mac": {
+                "type": "string",
+                "description": "Dirección MAC del dispositivo"
+              },
+              "sessionId": {
+                "type": "string",
+                "description": "ID de sesión (UUID) - opcional"
+              },
+              "imgUrl": {
+                "type": "string",
+                "description": "URL de la imagen del visitante"
+              }
+            }
+          }
+        ]
+      },
+      "IniciarSesionRequest": {
+        "allOf": [
+          { "$ref": "#/components/schemas/Request" },
+          {
+            "type": "object",
+            "properties": {
+              "mac": {
+                "type": "string",
+                "description": "Dirección MAC del dispositivo"
+              },
+              "sessionId": {
+                "type": "string",
+                "description": "ID de sesión (UUID) - opcional, si no se proporciona se genera uno nuevo"
+              }
+            },
+            "required": ["mac"]
+          }
+        ]
+      },
+      "ActualizarFotoRequest": {
+        "allOf": [
+          { "$ref": "#/components/schemas/Request" },
+          {
+            "type": "object",
+            "properties": {
+              "imgUrl": {
+                "type": "string",
+                "description": "URL de la imagen subida previamente a /api/media/upload"
+              }
+            },
+            "required": ["imgUrl"]
+          }
+        ]
+      },
+      "UserProfileCreateRequest": {
+        "allOf": [
+          { "$ref": "#/components/schemas/Request" },
+          {
+            "type": "object",
+            "properties": {
+              "displayName": {
+                "type": "string",
+                "description": "Nombre para mostrar"
+              },
+              "photoUrl": {
+                "type": "string",
+                "description": "URL de la foto de perfil"
+              }
+            },
+            "required": ["displayName"]
+          }
+        ]
+      },
+      "UserProfileUpdateRequest": {
+        "allOf": [
+          { "$ref": "#/components/schemas/Request" },
+          {
+            "type": "object",
+            "properties": {
+              "names": {
+                "type": "string"
+              },
+              "lastNames": {
+                "type": "string"
+              },
+              "nationality": {
+                "type": "string"
+              },
+              "phone": {
+                "type": "string"
+              },
+              "countryCode": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string",
+                "format": "email"
+              },
+              "avatar": {
+                "type": "string",
+                "description": "URL del avatar"
+              }
+            }
+          }
+        ]
+      },
+      "ResponseSuccessfulDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "integer",
+            "example": 200
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-01-15T10:30:00"
+          },
+          "idProcess": {
+            "type": "string",
+            "example": "PROC-12345"
+          },
+          "processResponse": {
+            "type": "object",
+            "description": "Datos específicos de la respuesta"
+          }
+        }
+      },
+      "LoginResponse": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["ok", "invaliduser", "invalidCredentials", "userInactive"],
+            "example": "ok"
+          },
+          "errorMessage": {
+            "type": "string"
+          },
+          "token": {
+            "type": "string",
+            "description": "Token JWT para autenticación",
+            "example": "eyJhbGciOiJIUzI1NiIs..."
+          },
+          "username": {
+            "type": "string"
+          }
+        }
+      },
+      "AnonymousSessionResponse": {
+        "type": "object",
+        "properties": {
+          "sessionId": {
+            "type": "string",
+            "description": "ID único de la sesión (UUID)",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          },
+          "token": {
+            "type": "string",
+            "description": "Token JWT temporal para autenticación de la sesión"
+          },
+          "type": {
+            "type": "string",
+            "example": "anonymous"
+          },
+          "expiresIn": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Tiempo de expiración en segundos"
+          },
+          "ip": {
+            "type": "string"
+          },
+          "mac": {
+            "type": "string"
+          },
+          "imgUrl": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "AnonymousSessionCreationResponse": {
+        "type": "object",
+        "properties": {
+          "sessionId": {
+            "type": "string",
+            "description": "ID único de la sesión (UUID)"
+          },
+          "token": {
+            "type": "string",
+            "description": "Token JWT temporal"
+          },
+          "type": {
+            "type": "string",
+            "example": "anonymous"
+          },
+          "expiresIn": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "DoorbellResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "name": {
+            "type": "string"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "callType": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "DoorbellCreationResponse": {
+        "type": "object",
+        "properties": {
+          "doorbell": {
+            "$ref": "#/components/schemas/DoorbellResponse"
+          },
+          "membersAdded": {
+            "type": "integer"
+          },
+          "notFoundContacts": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "UserProfileResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "names": {
+            "type": "string"
+          },
+          "lastNames": {
+            "type": "string"
+          },
+          "nationality": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "countryCode": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "avatar": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "UploadFileResponseDto": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "URL pública del archivo subido"
+          },
+          "fileId": {
+            "type": "string",
+            "description": "ID único del archivo"
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "Code": {
+            "type": "string",
+            "enum": ["ERR01", "ERR02", "ERR03", "ERR04", "ERR05"],
+            "example": "ERR01"
+          },
+          "DescCode": {
+            "type": "string",
+            "example": "Bad Request - Invalid input"
+          }
+        }
+      },
+      "BadRequestErrorResponseDTO": {
+        "type": "object",
+        "properties": {
+          "idProcess": {
+            "type": "string"
+          },
+          "date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "ConflictErrorResponseDTO": {
+        "allOf": [{ "$ref": "#/components/schemas/BadRequestErrorResponseDTO" }]
+      },
+      "TechnicalErrorResponseDto": {
+        "allOf": [{ "$ref": "#/components/schemas/BadRequestErrorResponseDTO" }]
+      },
+      "TimeOutResponseDto": {
+        "allOf": [{ "$ref": "#/components/schemas/BadRequestErrorResponseDTO" }]
+      },
+      "NotFountResponseDto": {
+        "allOf": [{ "$ref": "#/components/schemas/BadRequestErrorResponseDTO" }]
+      }
+    },
+    "responses": {
+      "BadRequest": {
+        "description": "Solicitud inválida",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/BadRequestErrorResponseDTO"
+            }
+          }
+        }
+      },
+      "NotFound": {
+        "description": "Recurso no encontrado",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/NotFountResponseDto"
+            }
+          }
+        }
+      },
+      "Conflict": {
+        "description": "Conflicto con el estado actual",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ConflictErrorResponseDTO"
+            }
+          }
+        }
+      },
+      "Timeout": {
+        "description": "Tiempo de espera agotado",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/TimeOutResponseDto"
+            }
+          }
+        }
+      },
+      "InternalError": {
+        "description": "Error interno del servidor",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/TechnicalErrorResponseDto"
+            }
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "BearerAuth": []
+    }
+  ]
+}
