@@ -1,6 +1,7 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import Webcam from 'react-webcam';
 import { motion } from 'framer-motion';
+import { useSearchParams } from 'react-router-dom';
 import {
   ArrowRightIcon,
   UserIcon,
@@ -8,6 +9,7 @@ import {
 } from
   'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { PublicDoorbellService } from '../services/PublicDoorbellService';
 
 interface RegistrationScreenProps {
   onContinue: () => void;
@@ -46,8 +48,29 @@ export function RegistrationScreen({ onContinue }: RegistrationScreenProps) {
     isAuthenticated
   } = useAuth();
   const webcamRef = useRef<Webcam>(null);
+  const [searchParams] = useSearchParams();
+  const ringCode = searchParams.get('ring');
 
   const canContinue = name.trim().length >= 2 && captured && !isRegistering && isAuthenticated;
+
+  // Get ring code from URL and fetch doorbell info
+  useEffect(() => {
+    if (ringCode) {
+      // Use the ring code as the callId
+      console.log('🔔 Ring code detected from URL:', ringCode);
+
+      // Fetch doorbell info
+      PublicDoorbellService.getDoorbellInfo(ringCode)
+        .then((response) => {
+          console.log('✅ Doorbell info response:', response);
+        })
+        .catch((error) => {
+          console.error('❌ Failed to fetch doorbell info:', error);
+        });
+    } else {
+      console.warn('⚠️ No ring code found in URL');
+    }
+  }, [ringCode]);
 
   const handleCapture = useCallback(() => {
     const imageSrc = webcamRef.current?.getScreenshot();
@@ -433,9 +456,9 @@ export function RegistrationScreen({ onContinue }: RegistrationScreenProps) {
 
             <label
               htmlFor="name-input"
-              className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 font-sora">
+              className={`block text-xs font-semibold uppercase tracking-wider mb-3 font-sora ${captured ? 'text-gray-500' : 'text-gray-400'}`}>
 
-              Your name
+              Your name {captured ? '' : '(Take photo first)'}
             </label>
             <input
               id="name-input"
@@ -444,8 +467,8 @@ export function RegistrationScreen({ onContinue }: RegistrationScreenProps) {
               onChange={(e) => setName(e.target.value)}
               onFocus={() => setInputFocused(true)}
               onBlur={() => setInputFocused(false)}
-              disabled={isRegistering}
-              placeholder="Enter your name"
+              disabled={isRegistering || !captured}
+              placeholder={captured ? "Enter your name" : "Take a photo first"}
               className="w-full max-w-sm px-5 py-4 rounded-2xl text-gray-900 placeholder-gray-400 font-sora text-base outline-none transition-all duration-300 disabled:opacity-50"
               style={{
                 background: inputFocused ?

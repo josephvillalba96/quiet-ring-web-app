@@ -192,7 +192,7 @@ export function LobbyScreen(props: LobbyScreenProps) {
 
     // Revisar cada 100ms hasta que esté listo
     const interval = setInterval(checkCallReady, 100);
-    
+
     // Timeout de 5 segundos
     const timeout = setTimeout(() => {
       clearInterval(interval);
@@ -219,7 +219,7 @@ export function LobbyScreen(props: LobbyScreenProps) {
   // AHORA StreamCall envuelve a LobbyContent, así que los hooks funcionan correctamente
   return (
     <StreamCall call={call}>
-      <LobbyContent 
+      <LobbyContent
         userName={userName}
         onCancel={onCancel}
         onCallStart={onCallStart}

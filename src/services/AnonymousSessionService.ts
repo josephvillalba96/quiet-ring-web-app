@@ -1,4 +1,5 @@
-import { apiClient, publicClient } from '../api/client';
+import axios from 'axios';
+import { apiClient, API_BASE_URL } from '../api/client';
 import { generateUUIDv4 } from '../utils/uuid';
 
 export interface DeviceInfo {
@@ -40,7 +41,7 @@ export interface GenericResponse<T> {
 export const AnonymousSessionService = {
     /**
      * Legacy/Complete Creation: Create session with image in one step
-     * Endpoint: POST /api/anonymous-sessions
+     * Endpoint: POST //anonymous-sessions
      */
     createLegacySession: async (mac: string, imgUrl: string, sessionId?: string): Promise<AnonymousSessionResponse> => {
         try {
@@ -87,13 +88,13 @@ export const AnonymousSessionService = {
 
     /**
      * Step 1: Start anonymous session
-     * Endpoint: POST /api/anonymous-sessions/iniciar
+     * Endpoint: POST //anonymous-sessions/iniciar
      * Saves the token to localStorage automatically.
      */
     startSession: async (mac: string): Promise<AnonymousSessionResponse> => {
         try {
-            // Use publicClient to avoid sending existing (potentially stale) tokens for new sessions
-            const response = await publicClient.post<GenericResponse<AnonymousSessionResponse>>('/anonymous-sessions/iniciar', {
+            // Use direct axios to avoid sending stale tokens from previous sessions
+            const response = await axios.post<GenericResponse<AnonymousSessionResponse>>(`${API_BASE_URL}/anonymous-sessions/iniciar`, {
                 idProcess: generateUUIDv4(),
                 mac
             });
@@ -123,7 +124,7 @@ export const AnonymousSessionService = {
 
     /**
      * Step 3: Update session photo
-     * Endpoint: PUT /api/anonymous-sessions/upload-mediafile/{sessionId}
+     * Endpoint: PUT //anonymous-sessions/upload-mediafile/{sessionId}
      * Token is automatically injected by interceptor.
      */
     updateSessionPhoto: async (sessionId: string, imgUrl: string): Promise<void> => {

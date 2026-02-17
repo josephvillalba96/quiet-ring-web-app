@@ -9,105 +9,118 @@
   --brand-coral: #ff6b4a;
   --brand-blue: #334295;
 }
+
 body {
   font-family: "Sora", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
 /* Gradient mesh animation for camera preview placeholder */
 @keyframes gradientMesh {
   0% {
     background-position: 0% 50%;
   }
+
   25% {
     background-position: 100% 0%;
   }
+
   50% {
     background-position: 100% 100%;
   }
+
   75% {
     background-position: 0% 100%;
   }
+
   100% {
     background-position: 0% 50%;
   }
 }
+
 .gradient-mesh {
-  background: linear-gradient(
-    -45deg,
-    #ea592d,
-    #ff6b4a,
-    #7c3aed,
-    #334295,
-    #ea592d,
-    #ff8a65
-  );
+  background: linear-gradient(-45deg,
+      #ea592d,
+      #ff6b4a,
+      #7c3aed,
+      #334295,
+      #ea592d,
+      #ff8a65);
   background-size: 400% 400%;
   animation: gradientMesh 8s ease infinite;
 }
+
 /* Shimmer effect for loading text */
 @keyframes shimmer {
   0% {
     background-position: -200% center;
   }
+
   100% {
     background-position: 200% center;
   }
 }
+
 .text-shimmer {
-  background: linear-gradient(
-    90deg,
-    #9ca3af 0%,
-    #ea592d 25%,
-    #334295 50%,
-    #ea592d 75%,
-    #9ca3af 100%
-  );
+  background: linear-gradient(90deg,
+      #9ca3af 0%,
+      #ea592d 25%,
+      #334295 50%,
+      #ea592d 75%,
+      #9ca3af 100%);
   background-size: 200% auto;
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
   animation: shimmer 3s linear infinite;
 }
+
 /* Rotating gradient ring for avatar */
 @keyframes rotateGradient {
   0% {
     transform: rotate(0deg);
   }
+
   100% {
     transform: rotate(360deg);
   }
 }
+
 .gradient-ring {
-  background: conic-gradient(
-    from 0deg,
-    #ea592d,
-    #ff6b4a,
-    #7c3aed,
-    #334295,
-    #ea592d
-  );
+  background: conic-gradient(from 0deg,
+      #ea592d,
+      #ff6b4a,
+      #7c3aed,
+      #334295,
+      #ea592d);
   animation: rotateGradient 3s linear infinite;
 }
+
 /* Pulse glow for PiP */
 @keyframes pipGlow {
+
   0%,
   100% {
     box-shadow: 0 0 16px 3px rgba(234, 89, 45, 0.25),
       0 0 32px 6px rgba(51, 66, 149, 0.12);
   }
+
   50% {
     box-shadow: 0 0 24px 6px rgba(234, 89, 45, 0.4),
       0 0 48px 12px rgba(51, 66, 149, 0.25);
   }
 }
+
 .pip-glow {
   animation: pipGlow 2.5s ease-in-out infinite;
 }
+
 /* Gradient border utility */
 .gradient-border-top {
   position: relative;
 }
+
 .gradient-border-top::before {
   content: "";
   position: absolute;
@@ -125,6 +138,7 @@ body {
 
 /* Mobile Video Layout - Full screen optimization */
 @media (max-width: 768px) {
+
   /* Force full viewport coverage */
   .mobile-video-layout {
     width: 100vw !important;
@@ -244,4 +258,137 @@ body {
 /* Ensure controls don't overlap with safe areas */
 .safe-area-inset {
   padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+/* =====================================================
+   MOBILE VIDEO LAYOUT STYLES - Grid & PiP
+   ===================================================== */
+
+/* Main container */
+.mobile-video-layout {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  background: #000;
+}
+
+/* Single participant - Full screen */
+.mobile-video-main {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.mobile-video-main .str-video__participant-view,
+.mobile-video-main .str-video__participant-view video {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+}
+
+/* Picture-in-Picture - Proporcional a la pantalla (horizontal 16:9) */
+.mobile-video-pip {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  height: 20vh;
+  /* 1/5 de la altura de la pantalla */
+  aspect-ratio: 16 / 9;
+  /* Horizontal */
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 0 2px rgba(255, 255, 255, 0.3);
+  z-index: 100;
+  background: #000;
+}
+
+/* Asegurar que VideoPreview se vea correctamente */
+.mobile-video-pip .str-video__video-preview {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.mobile-video-pip .str-video__video-preview video {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+}
+
+/* Mobile Grid Layout */
+.mobile-grid {
+  display: grid;
+  gap: 8px;
+  padding: 8px;
+  height: 100%;
+  width: 100%;
+  overflow-y: auto;
+}
+
+/* 1 participant */
+.mobile-grid-1 {
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr;
+}
+
+/* 2-4 participants */
+.mobile-grid-2 {
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+}
+
+/* 5+ participants */
+.mobile-grid-many {
+  grid-template-columns: repeat(2, 1fr);
+  grid-auto-rows: minmax(140px, 1fr);
+}
+
+/* Grid items */
+.mobile-grid>div {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #1f2937;
+}
+
+.mobile-grid .str-video__participant-view,
+.mobile-grid .str-video__participant-view video {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+}
+
+/* Ensure videos fill properly in grid */
+.mobile-grid video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+  .mobile-video-pip {
+    touch-action: pan-y;
+  }
+
+  .mobile-video-pip:active {
+    cursor: grabbing;
+  }
+}
+
+/* Prevent text selection while dragging */
+.mobile-video-layout * {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Allow text selection on inputs */
+.mobile-video-layout input,
+.mobile-video-layout textarea {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
 }

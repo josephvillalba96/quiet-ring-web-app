@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { AnimatePresence } from 'framer-motion';
-import { Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
+import { Routes, Route, useNavigate, useLocation, Navigate, useSearchParams } from 'react-router-dom';
 import { RegistrationScreen } from './components/RegistrationScreen';
 import { LobbyScreen } from './components/LobbyScreen';
 import { VideoCallScreen } from './components/VideoCallScreen';
@@ -16,14 +16,19 @@ import '@stream-io/video-react-sdk/dist/css/styles.css';
 import { AuthService } from './services/AuthService';
 import { AuthGuard } from './components/AuthGuard';
 import { useAuth } from './contexts/AuthContext';
+import { PublicDoorbellService } from './services/PublicDoorbellService';
 
 // =============== CONFIG ===============
 const apiKey = import.meta.env.VITE_STREAM_API_KEY;
 // =====================================
 
+
+
 function AppContent() {
   const navigate = useNavigate();
   const location = useLocation();
+  const [searchParams] = useSearchParams();
+  const ringCode = searchParams.get('ring');
 
   // App State
   // Auth State from Context
@@ -33,6 +38,7 @@ function AppContent() {
   // Stream Video State
   const [client, setClient] = useState<StreamVideoClient | null>(null);
   const [call, setCall] = useState<Call | null>(null);
+  const [doorbellInfo, setDoorbellInfo] = useState<any>(null);
   const initializationRef = useRef(false);
 
   // Initialize Stream Client when user is authenticated
@@ -65,8 +71,9 @@ function AppContent() {
 
         await videoClient.connectUser(user, token);
 
-        // Create the call instance
-        const callId = Math.floor(Math.random() * (9000000 - 1000000 + 1) + 1000000).toString();
+        // Get callId from URL ring parameter or generate random one
+        const callId = ringCode + Math.floor(Math.random() * (90000 - 10000 + 1) + 10000).toString();
+        console.log('📞 Using callId:', callId);
         const myCall = videoClient.call('default', callId);
 
         setClient(videoClient);
@@ -87,6 +94,24 @@ function AppContent() {
       }
     };
   }, [localUserName, isAuthenticated, streamUserId]);
+
+
+  // Fetch doorbell info when ring code is present AND user is authenticated
+  useEffect(() => {
+    if (ringCode && isAuthenticated) {
+      console.log('🔔 Ring code detected and user authenticated, fetching info:', ringCode);
+      PublicDoorbellService.getDoorbellInfo(ringCode)
+        .then(doorbell => {
+          console.log('✅ Doorbell info loaded:', doorbell);
+          setDoorbellInfo(doorbell);
+        })
+        .catch(err => {
+          console.error('❌ Failed to load doorbell info:', err);
+        });
+    } else if (ringCode && !isAuthenticated) {
+      console.log('⏳ Waiting for authentication to fetch doorbell info...');
+    }
+  }, [ringCode, isAuthenticated]);
 
 
   const handleRegistrationComplete = () => {
@@ -123,33 +148,106 @@ function AppContent() {
           return;
         }
 
-        // 1. Join and Get Stream call instance
+
+        // 1. Extract remote members directly from doorbell info
+        const remoteMembers = (doorbellInfo || [])
+          .filter((m: any) => m && m.user_id)
+          .map((m: any) => ({ user_id: m.user_id }));
+
+        console.log('� Remote members to add:', remoteMembers);
+
+        if (remoteMembers.length === 0) {
+          console.warn('⚠️ No remote members found in doorbellInfo. Call will be just local user.');
+        }
+
+        // 2. Prepare call members (Local + Remote)
+        const callMembers = [
+          { user_id: streamUserId, role: 'admin' },
+          ...remoteMembers
+        ];
+
+        // Unique check
+        const uniqueMembers = Array.from(new Set(callMembers.map(m => m.user_id)))
+          .map(id => callMembers.find(m => m.user_id === id));
+
+        console.log('📝 Initializing call with members:', uniqueMembers);
+
         try {
+          // 3. Get or Create the call
           await call.getOrCreate({
             data: {
-              members: [
-                { user_id: streamUserId },
-                { user_id: '3246513976-5785369ebaa940d2a6901823d421b722' }
-              ],
+              members: uniqueMembers,
               created_by_id: streamUserId,
               custom: { type: 'anonymous_video', creatorName: localUserName }
             } as any,
             ring: true
           });
-        } catch (wsError: any) {
-          console.error('❌ WebSocket connection failed:', wsError);
-          if (wsError.message?.includes('WS connection could not be established')) {
-            alert('Unable to connect to video server. This might be a network or authentication issue. Please try again in a moment.');
-          } else {
-            alert('Failed to create call. Please try again.');
+
+          // 4. FORCE UPDATE MEMBERS (Critical Fix)
+          // If the call already existed (common with fixed callId), getOrCreate might NOT update members.
+          // We force-add them here using updateCall (addMembers is not a function on Call object per error).
+          if (uniqueMembers.length > 1) {
+            try {
+              console.log('🔄 Ensuring all members are added via updateCall:', uniqueMembers);
+              await call.updateCall({ members: uniqueMembers });
+            } catch (addError) {
+              console.warn('⚠️ Note: Error updating call members:', addError);
+            }
           }
-          return;
+
+          // 5. DIAGNOSTICS
+          const membersList = await call.queryMembers({});
+          console.log('👥 Final Member List (Server):', membersList);
+
+          // Validation (Check both user.id and user_id)
+          const isLocalMember = membersList.members.some((m: any) =>
+            (m.user && m.user.id === streamUserId) || m.user_id === streamUserId
+          );
+
+          if (!isLocalMember) {
+            console.warn('⚠️ Warning: Local user not found in member list under expected keys.');
+          }
+
+        } catch (wsError: any) {
+          console.error('❌ WebSocket/Create error:', wsError);
+          if (wsError.message?.includes('WS connection could not be established')) {
+            alert('Unable to connect to video server. Please try again.');
+            return;
+          } else {
+            console.warn('Call creation error, attempting to proceed to join as fallback...');
+          }
         }
 
         // 2. Actually join
-        await call.join();
+        console.log('🚀 Attempting to join call...');
 
-        navigate('/video-call');
+        try {
+          // Final membership check with permissive fallback
+          const finalMembers = await call.queryMembers({});
+          const isMember = finalMembers.members.some((m: any) =>
+            (m.user && m.user.id === streamUserId) || m.user_id === streamUserId
+          );
+
+          if (isMember) {
+            console.log('✅ Confirmed membership. Joining...');
+            await call.join();
+            navigate('/video-call');
+          } else {
+            console.warn('⚠️ User not found in members list, forcing join (Anonymous/Guest mode)...');
+            // Force join anyway - Stream might allow it depending on settings
+            await call.join();
+            navigate('/video-call');
+          }
+        } catch (joinError) {
+          console.error('❌ Join failed:', joinError);
+          // One last try blindly?
+          try {
+            await call.join();
+            navigate('/video-call');
+          } catch (finalError) {
+            alert('Could not join call. Please check console.');
+          }
+        }
       }
     } catch (e) {
       console.error("Error creating/joining call", e);
@@ -171,14 +269,12 @@ function AppContent() {
     }
     // Set call to null to ensure we don't reuse a stale call object
     setCall(null);
-    // Regenerate call for the next use (lobby needs it for preview)
-    if (client) {
-      const callId = Math.floor(Math.random() * (9000000 - 1000000 + 1) + 1000000).toString();
-      setCall(client.call('default', callId));
-    }
 
-    // Go to lobby if authenticated, else home
-    navigate(isAuthenticated ? '/lobby' : '/');
+    // Logout to clear session and return to fresh registration
+    logout();
+
+    // Navigate to registration screen
+    navigate('/');
   };
 
   // Fallback client for Registration (unauthenticated)

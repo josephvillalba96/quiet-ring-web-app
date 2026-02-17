@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api';
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
 
 export const apiClient = axios.create({
     baseURL: API_BASE_URL,
@@ -9,14 +9,17 @@ export const apiClient = axios.create({
     },
 });
 
+
+
+// Export public client without interceptors
 export const publicClient = axios.create({
-    baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api', // Root base functionality
+    baseURL: API_BASE_URL,
     headers: {
         'Content-Type': 'application/json',
     },
 });
 
-// Request interceptor to add the auth token header to requests
+// Request interceptor to add the auth token header to requests (only for apiClient)
 apiClient.interceptors.request.use(
     (config) => {
         const token = localStorage.getItem('sessionToken');
