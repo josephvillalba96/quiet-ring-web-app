@@ -12,12 +12,21 @@ export const VerticalCallLayout = () => {
     const localParticipant = useLocalParticipant();
     const dominantSpeaker = useDominantSpeaker();
 
-    // Lógica: Speaker dominante arriba, resto abajo en scroll
+    // Lógica: Priorizar participantes remotos para la pantalla principal.
+    // El usuario local debe ir a los thumbnails (PiP).
     const mainParticipant = useMemo(() => {
-        return dominantSpeaker || localParticipant || participants[0];
+        const remoteParticipants = participants.filter(p => p.sessionId !== localParticipant?.sessionId);
+        if (remoteParticipants.length > 0) {
+            // Si el orador dominante es remoto, lo usamos. Si no, el primer remoto disponible.
+            const isDominantRemote = dominantSpeaker && dominantSpeaker.sessionId !== localParticipant?.sessionId;
+            return isDominantRemote ? dominantSpeaker : remoteParticipants[0];
+        }
+        // Si no hay nadie más, mostramos al local como fallback.
+        return localParticipant;
     }, [dominantSpeaker, localParticipant, participants]);
 
     const otherParticipants = useMemo(() => {
+        // Los "otros" son todos los que no están en la pantalla principal (incluyendo al local si el main es remoto).
         return participants.filter(p => p.sessionId !== mainParticipant?.sessionId);
     }, [participants, mainParticipant]);
 
