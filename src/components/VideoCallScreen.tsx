@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import {
   Call,
   StreamCall,
-  CallControls,
+  CallControls, // Restore SDK Controls
   useCallStateHooks,
   useCall,
   CallingState
@@ -16,6 +16,10 @@ interface VideoCallScreenProps {
 }
 
 
+
+import { VerticalCallLayout } from './VerticalLayout/VerticalCallLayout';
+// import { FixedBottomControls } from './VerticalLayout/FixedBottomControls'; // User rejected this
+import './VerticalLayout/vertical-mobile-call.css';
 
 // Internal component to handle call state and layout
 const CallLayout = ({ onEndCall }: { onEndCall: () => void }) => {
@@ -34,36 +38,39 @@ const CallLayout = ({ onEndCall }: { onEndCall: () => void }) => {
     };
   }, [call]);
 
-  if (callingState !== CallingState.JOINED) {
-    // If we're already left or in some other terminal state, don't show "Connecting..."
+  // Handle auto-navigation when call ends
+  useEffect(() => {
     if (callingState === CallingState.LEFT) {
-      return <div className="h-full bg-gray-950" />;
+      onEndCall();
+    }
+  }, [callingState, onEndCall]);
+
+  if (callingState !== CallingState.JOINED) {
+    if (callingState === CallingState.LEFT) {
+      return <div className="h-full bg-black" />; // Black background for mobile vibe
     }
 
     return (
-      <div className="flex items-center justify-center h-full text-white font-sora">
+      <div className="flex items-center justify-center h-full text-white font-sora bg-black">
         <div className="flex flex-col items-center gap-4">
           <div className="w-8 h-8 rounded-full border-2 border-brand-orange border-t-transparent animate-spin" />
-          <p>Connecting to call...</p>
+          <p>Connecting...</p>
         </div>
       </div>
     );
   }
 
+  // Vertical Mobile Layout Structure
   return (
-    <div className="w-full h-full flex flex-col md:items-center md:justify-center md:p-4">
-      {/* Main Video Layout - Responsive: Mobile gets full screen, Desktop gets SpeakerLayout */}
-      <div className="w-full flex-1 relative md:rounded-3xl overflow-hidden shadow-2xl bg-gray-900 md:border md:border-white/10 md:mb-6">
-        <ResponsiveVideoLayout />
-      </div>
+    <div className="vertical-call-wrapper">
+      <VerticalCallLayout />
 
-      {/* Controls */}
-      {/* Stream SDK provides <CallControls /> but we can use our custom ControlBar if adapted, 
-                or just use SDK controls for simplicity and reliability first. 
-                Let's use SDK controls to ensure functionality, styled if possible. 
-                Or we can wrap our own. Let's start with SDK controls to be safe. 
-            */}
-      <div className="w-full flex justify-center pb-8 safe-area-bottom">
+      {/* 
+          User requested specifically "original controls" because the custom ones were "terrible".
+          Restoring SDK CallControls. 
+          We wrap it to position it at the bottom.
+       */}
+      <div className="vertical-controls-wrapper">
         <CallControls onLeave={onEndCall} />
       </div>
     </div>

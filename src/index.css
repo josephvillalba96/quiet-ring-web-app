@@ -133,134 +133,6 @@ body {
 }
 
 /* =====================================================
-   STREAM VIDEO SDK - MOBILE RESPONSIVE OVERRIDES
-   ===================================================== */
-
-/* Mobile Video Layout - Full screen optimization */
-@media (max-width: 768px) {
-
-  /* Force full viewport coverage */
-  .mobile-video-layout {
-    width: 100vw !important;
-    height: 100dvh !important;
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    z-index: 50;
-  }
-
-  /* Override Stream SDK participant view for mobile */
-  .str-video__participant-view {
-    width: 100% !important;
-    height: 100% !important;
-    min-width: 100vw !important;
-    min-height: 100dvh !important;
-  }
-
-  /* Force video to cover entire container */
-  .str-video__participant-view video {
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: cover !important;
-    object-position: center !important;
-  }
-
-  /* Hide participant bar in mobile SpeakerLayout */
-  .str-video__speaker-layout__participants-bar,
-  .str-video__speaker-layout__participants-bar-container {
-    display: none !important;
-  }
-
-  /* Make spotlight view take full screen */
-  .str-video__speaker-layout__spotlight,
-  .str-video__speaker-layout__spotlight-container {
-    width: 100vw !important;
-    height: 100dvh !important;
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-  }
-
-  /* Remove padding and margins in mobile view */
-  .str-video__speaker-layout {
-    padding: 0 !important;
-    margin: 0 !important;
-    width: 100vw !important;
-    height: 100dvh !important;
-  }
-
-  /* Ensure call controls are visible and properly positioned */
-  .str-video__call-controls {
-    position: fixed !important;
-    bottom: max(24px, env(safe-area-inset-bottom)) !important;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    z-index: 100 !important;
-    background: rgba(0, 0, 0, 0.6) !important;
-    backdrop-filter: blur(10px) !important;
-    border-radius: 24px !important;
-    padding: 8px 16px !important;
-  }
-
-  /* Video call screen container adjustments */
-  .str-video {
-    width: 100vw !important;
-    height: 100dvh !important;
-    overflow: hidden !important;
-  }
-}
-
-/* Small mobile devices */
-@media (max-width: 480px) {
-  .str-video__participant-view video {
-    object-fit: cover !important;
-  }
-
-  /* Ensure participant name overlay is readable */
-  .mobile-video-layout .participant-name-overlay {
-    font-size: 14px !important;
-    padding: 6px 12px !important;
-  }
-}
-
-/* Safe area insets for notched devices */
-@supports (padding-top: env(safe-area-inset-top)) {
-  .mobile-video-layout {
-    padding-top: env(safe-area-inset-top);
-    padding-bottom: env(safe-area-inset-bottom);
-    padding-left: env(safe-area-inset-left);
-    padding-right: env(safe-area-inset-right);
-  }
-}
-
-/* Prevent scrolling on mobile during video call */
-@media (max-width: 768px) {
-  body:has(.mobile-video-layout) {
-    overflow: hidden !important;
-    position: fixed !important;
-    width: 100% !important;
-    height: 100% !important;
-  }
-}
-
-/* =====================================================
-   UTILITY CLASSES
-   ===================================================== */
-
-.safe-area-bottom {
-  padding-bottom: env(safe-area-inset-bottom);
-}
-
-.safe-area-top {
-  padding-top: env(safe-area-inset-top);
-}
-
-/* Ensure controls don't overlap with safe areas */
-.safe-area-inset {
-  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
-}
-
-/* =====================================================
    MOBILE VIDEO LAYOUT STYLES - Grid & PiP
    ===================================================== */
 
@@ -280,22 +152,14 @@ body {
   position: relative;
 }
 
-.mobile-video-main .str-video__participant-view,
-.mobile-video-main .str-video__participant-view video {
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: cover !important;
-}
-
-/* Picture-in-Picture - Proporcional a la pantalla (horizontal 16:9) */
+/* Picture-in-Picture */
 .mobile-video-pip {
   position: absolute;
   top: 16px;
   right: 16px;
-  height: 20vh;
-  /* 1/5 de la altura de la pantalla */
-  aspect-ratio: 16 / 9;
-  /* Horizontal */
+  width: 120px;
+  /* Fixed width, let height adjust or auto */
+  max-width: 30vw;
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 0 2px rgba(255, 255, 255, 0.3);
@@ -303,17 +167,6 @@ body {
   background: #000;
 }
 
-/* Asegurar que VideoPreview se vea correctamente */
-.mobile-video-pip .str-video__video-preview {
-  width: 100% !important;
-  height: 100% !important;
-}
-
-.mobile-video-pip .str-video__video-preview video {
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: cover !important;
-}
 
 /* Mobile Grid Layout */
 .mobile-grid {
@@ -391,4 +244,265 @@ body {
   -moz-user-select: text;
   -ms-user-select: text;
   user-select: text;
+}
+
+/* =====================================================
+   SWIPE VIDEO LAYOUT (Horizontal Scroll)
+   ===================================================== */
+
+/* Main container for swipe layout */
+.swipe-video-layout {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #000;
+}
+
+/* Container for all slides - horizontal scroll */
+.swipe-video-container {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  height: 100%;
+  width: 100%;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.swipe-video-container::-webkit-scrollbar {
+  display: none;
+}
+
+/* Individual slide */
+.swipe-video-slide {
+  flex: 0 0 100%;
+  scroll-snap-align: start;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: 1fr;
+  gap: 8px;
+  padding: 8px;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+/* Video Cover Utility for Mobile */
+.mobile-spotlight-view video {
+  object-fit: cover !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Single participant full screen */
+.swipe-single-participant {
+  width: 100%;
+  height: 100%;
+}
+
+.swipe-single-participant .str-video__participant-view,
+.swipe-single-participant .str-video__participant-view video {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+}
+
+/* Participant tile in swipe */
+.swipe-participant-tile {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #1f2937;
+}
+
+.swipe-participant-tile .str-video__participant-view,
+.swipe-participant-tile .str-video__participant-view video {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+}
+
+/* Participant label */
+.swipe-participant-label {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  padding: 4px 8px;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 6px;
+  font-size: 12px;
+  color: white;
+  font-weight: 500;
+}
+
+/* Local participant PIP in swipe */
+.swipe-local-pip {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #1f2937;
+}
+
+.swipe-local-pip .str-video__video-preview,
+.swipe-local-pip .str-video__video-preview video {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  transform: scaleX(-1);
+}
+
+.swipe-local-pip-label {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  padding: 4px 8px;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 6px;
+  font-size: 12px;
+  color: white;
+  font-weight: 500;
+}
+
+/* Pagination dots */
+.swipe-pagination {
+  position: absolute;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  z-index: 10;
+}
+
+.swipe-pagination-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.4);
+  transition: none;
+}
+
+
+/* =====================================================
+   SPEAKER VIDEO LAYOUT (Active Speaker + Bar)
+   ===================================================== */
+
+/* Layout Container */
+.speaker-video-layout {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: #000;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Spotlight Area */
+.spotlight-container {
+  flex: 1;
+  /* Takes all remaining space */
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+}
+
+.spotlight-container .str-video__participant-view,
+.spotlight-container .str-video__participant-view video {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  /* Keep aspect ratio for main speaker, or cover if preferred */
+  background: #111;
+}
+
+/* On mobile, cover is usually better to fill screen, even if cropped */
+@media (max-width: 768px) {
+  .spotlight-container .str-video__participant-view video {
+    object-fit: cover !important;
+  }
+}
+
+.participant-label-large {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  padding: 6px 12px;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  border-radius: 8px;
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  z-index: 10;
+  pointer-events: none;
+}
+
+/* Participants Bar Container */
+.participants-bar-container {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 8px 0;
+  flex-shrink: 0;
+  z-index: 20;
+}
+
+/* Horizontal Scroll Area */
+.participants-bar-scroll {
+  display: flex;
+  gap: 8px;
+  padding: 0 12px;
+  overflow-x: auto;
+  height: 100%;
+  align-items: center;
+  scrollbar-width: none;
+  /* Hide scrollbar Firefox */
+  -ms-overflow-style: none;
+  /* Hide scrollbar IE/Edge */
+}
+
+.participants-bar-scroll::-webkit-scrollbar {
+  display: none;
+  /* Hide scrollbar Chrome/Safari */
+}
+
+/* Individual Item in Bar */
+.participant-bar-item {
+  width: 100px;
+  height: 100%;
+  /* Fill the container height minus padding */
+  flex-shrink: 0;
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #222;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.participant-bar-item .str-video__participant-view,
+.participant-bar-item .str-video__participant-view video {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+}
+
+.participant-label-small {
+  position: absolute;
+  bottom: 4px;
+  left: 4px;
+  padding: 2px 6px;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 4px;
+  color: white;
+  font-size: 10px;
+  max-width: 90%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

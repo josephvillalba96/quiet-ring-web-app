@@ -47,6 +47,25 @@ const LobbyContent = ({
     }
   }, [camEnabled, call]);
 
+  // Apply mobile constraints (9:16) when camera is ready
+  const { useCameraState } = useCallStateHooks();
+  const { mediaStream } = useCameraState();
+
+  useEffect(() => {
+    if (mediaStream && camEnabled) {
+      const videoTrack = mediaStream.getVideoTracks()[0];
+      if (videoTrack) {
+        console.log('📱 Applying mobile portrait constraints (9:16)...');
+        videoTrack.applyConstraints({
+          width: { ideal: 720 },
+          height: { ideal: 1280 },
+          aspectRatio: { ideal: 0.5625 }, // 9/16
+          facingMode: 'user'
+        }).catch(e => console.warn('⚠️ Could not apply mobile constraints:', e));
+      }
+    }
+  }, [mediaStream, camEnabled]);
+
   // Cleanup media on unmount
   useEffect(() => {
     return () => {

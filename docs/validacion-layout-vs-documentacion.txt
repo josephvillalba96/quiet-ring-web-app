@@ -1,0 +1,193 @@
+================================================================================
+VALIDACION DE IMPLEMENTACION CONTRA DOCUMENTACION GETSTREAM.IO
+Video Layout - https://getstream.io/video/docs/react/ui-cookbook/video-layout/
+================================================================================
+
+FECHA: 2026-02-19
+PROYECTO: quiet-ring-web-app
+VERSION: 2.0 (ACTUALIZADA DESPUES DE CORRECCIONES)
+
+================================================================================
+SECCION 1: BEST PRACTICES DE LA DOCUMENTACION
+================================================================================
+
+DOCUMENTACION Dice:
+-------------------
+1. Use `ParticipantView` for rendering - it handles video subscriptions and 
+   dynascale automatically.
+
+2. Call `setViewport()` on scrollable containers to optimize bandwidth 
+   (only subscribe to visible videos).
+
+3. Use `setSortParticipantsBy()` for custom participant ordering.
+
+4. Keep sorting logic stateless or memoized to avoid unnecessary re-renders.
+
+
+VALIDACION ACTUAL (DESPUES DE CORRECCIONES):
+--------------------------------------------
+[✅] ITEM 1: ParticipantView
+       IMPLEMENTADO en:
+       - MobileVideoLayout.tsx (lineas 16, 38, 73)
+       - SwipeVideoLayout.tsx (lineas 21-24)
+       ESTADO: CORRECTO
+
+[✅] ITEM 2: setViewport() en contenedores scrollables
+       IMPLEMENTADO en:
+       - MobileVideoLayout.tsx (lineas 118-127) - contenedor principal
+       - SwipeVideoLayout.tsx (lineas 56-67) - CONTENEDOR SWIPE SCROLLABLE ***NUEVO***
+       ESTADO: CORRECTO
+
+[✅] ITEM 3: setSortParticipantsBy()
+       IMPLEMENTADO en:
+       - MobileVideoLayout.tsx (lineas 129-142) ***NUEVO***
+       - SwipeVideoLayout.tsx (lineas 69-82) ***NUEVO***
+       Sorting: screen share > others, local participant last
+       ESTADO: CORRECTO
+
+[✅] ITEM 4: Sorting logic memoized
+       IMPLEMENTADO en:
+       - MobileVideoLayout.tsx - useMemo para separacion de participantes
+       - SwipeVideoLayout.tsx - useMemo para slides
+       ESTADO: CORRECTO
+
+
+================================================================================
+SECCION 2: COMPONENTES UTILIZADOS
+================================================================================
+
+DOCUMENTACION Usa:
+------------------
+- <ParticipantView /> - renderiza video del participante
+- useCall() - hook para instancia de llamada
+- useCallStateHooks() - envuelve todos los hooks de estado
+- useParticipants() - lista de participantes
+- hasScreenShare() - para detectar screen share
+
+
+VALIDACION ACTUAL:
+------------------
+[✅] ParticipantView         - Implementado en todos los layouts
+[✅] useCall()              - MobileVideoLayout.tsx linea 91, SwipeVideoLayout.tsx linea 47
+[✅] useCallStateHooks()    - Usado en ambos componentes
+[✅] useParticipants()      - Usado en ambos componentes
+[✅] hasScreenShare()      - Implementado para trackType y sorting
+
+
+================================================================================
+SECCION 3: BANDWIDTH Y CPU OPTIMIZATION
+================================================================================
+
+DOCUMENTACION Dice:
+-------------------
+"In calls with a large number of participants, your horizontal list will grow 
+past viewable boundaries. Each of these `ParticipantView` components will 
+keep subscribing to the video stream and will keep playing it even if they're 
+not visible to the user which is wasteful because of heavy CPU and bandwidth 
+usage."
+
+"To mitigate this issue each `Call` instance utilizes one `ViewportTracker` 
+instance (`call.dynascaleManager.viewportTracker`) with `observe` and 
+`setViewport` methods."
+
+
+VALIDACION ACTUAL (DESPUES DE CORRECCIONES):
+--------------------------------------------
+[✅] setViewport() aplicado correctamente
+     
+     IMPLEMENTADO:
+     - MobileVideoLayout.tsx: setViewport en containerRef (contenedor principal)
+     - SwipeVideoLayout.tsx: setViewport en swipeContainerRef (contenedor scrollable)
+     
+     Esto asegura que solo se suscriban a los videos visibles
+
+[✅] ParticipantView maneja observe automaticamente
+     ESTADO: Correcto - el SDK lo hace internamente
+
+
+================================================================================
+SECCION 4: SORTING PARTICIPANTS
+================================================================================
+
+DOCUMENTACION Recomienda:
+-------------------------
+- Presenter displayed first
+- Dominant speaker displayed next
+- Pinned participants after
+- Then: speaking/hand raised, video+audio, video-only, audio-only, muted
+
+
+IMPLEMENTACION ACTUAL:
+----------------------
+[✅] Sorting personalizado implementado en ambos componentes
+
+     ORDEN DE PRIORIDAD:
+     1. Screen sharing (prioridad maxima)
+     2. Participante local al final (ultimo)
+     
+     NOTA: Se implemento una version simplificada segun necessidad del proyecto
+
+
+================================================================================
+SECCION 5: LAYOUTS IMPLEMENTADOS
+================================================================================
+
+REQUERIMIENTOS DEL PROYECTO:
+-----------------------------
+- 1 participante: Fullscreen
+- 2 participantes: PiP
+- 3-6 participantes: Swipe horizontal (2 por slide)
+
+IMPLEMENTACION ACTUAL:
+----------------------
+[✅] 1 participante  -> SingleParticipantView (fullscreen)
+[✅] 2 participantes -> DraggablePIP
+[✅] 3-6 participantes -> SwipeVideoLayout con scroll-snap
+[✅] Participante local siempre en primer slide
+[✅] Pagination dots para navegacion
+
+
+================================================================================
+SECCION 6: RESUMEN DE HALLAZGOS
+================================================================================
+
+CRITERIOS VALIDADOS (VERSION ACTUAL):
+-------------------------------------
+| Criterio                    | Estado    | Notas                           |
+|-----------------------------|-----------|---------------------------------|
+| ParticipantView             | ✅ OK     | Usado en todos los layouts     |
+| setViewport()               | ✅ OK     | En contenedor principal Y swipe |
+| setSortParticipantsBy()     | ✅ OK     | Implementado en ambos          |
+| Sorting memoized            | ✅ OK     | useMemo usado correctamente     |
+
+
+CUMPLIMIENTO: 100% (4 de 4 best practices implementados)
+
+================================================================================
+SECCION 7: ARCHIVOS MODIFICADOS
+================================================================================
+
+| Archivo                        | Cambios                                    |
+|--------------------------------|--------------------------------------------|
+| SwipeVideoLayout.tsx          | + useCall, + setViewport, + sorting       |
+| MobileVideoLayout.tsx         | + setSortParticipantsBy                   |
+| index.css                     | Estilos swipe layout                       |
+
+
+================================================================================
+CONCLUSION
+================================================================================
+
+CUMPLIMIENTO: 100%
+
+Todos los best practices de la documentacion han sido implementados:
+
+- ✅ ParticipantView para renderizado
+- ✅ setViewport() en contenedores scrollables (swipe y principal)
+- ✅ setSortParticipantsBy() para ordenamiento personalizado
+- ✅ Sorting logic memoized
+
+La implementacion cumple con los requerimientos del proyecto y las 
+recomendaciones de la documentacion oficial de GetStream.io
+
+================================================================================
