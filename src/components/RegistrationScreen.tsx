@@ -128,7 +128,7 @@ export function RegistrationScreen({ onContinue }: RegistrationScreenProps) {
         stiffness: 300,
         damping: 30
       }}
-      className="min-h-screen w-full relative overflow-hidden"
+      className="min-h-screen w-full relative overflow-y-auto"
       style={{
         background:
           'linear-gradient(160deg, #fdfcfb 0%, #fff7ed 30%, #fef3ec 60%, #f5f0ff 100%)'
@@ -290,6 +290,7 @@ export function RegistrationScreen({ onContinue }: RegistrationScreenProps) {
                     width: 720,
                     height: 1280
                   }}
+                  mirrored={true}
                   className="absolute inset-0 w-full h-full object-cover"
                   style={{ objectFit: 'cover' }}
                 />

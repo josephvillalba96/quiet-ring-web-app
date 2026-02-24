@@ -299,7 +299,7 @@ function AppContent() {
   // However, keeping the structure simple:
 
   return (
-    <div className="w-full min-h-screen font-sora overflow-hidden">
+    <div className="w-full min-h-screen font-sora overflow-x-hidden overflow-y-auto">
       {client ? (
         <StreamVideo client={client}>
           <StreamTheme>
