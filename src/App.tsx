@@ -173,29 +173,18 @@ function AppContent() {
         console.log('📝 Initializing call with members:', uniqueMembers);
 
         try {
-          // 3. Get or Create the call
+          // 3. Get or Create the call - ONLY with local user first (temp fix)
+          // Remote users must be created in Stream backend first
           await call.getOrCreate({
             data: {
-              members: uniqueMembers,
+              members: [{ user_id: streamUserId, role: 'admin' }],
               created_by_id: streamUserId,
               custom: { type: 'anonymous_video', creatorName: localUserName }
             } as any,
             ring: true
           });
 
-          // 4. FORCE UPDATE MEMBERS (Critical Fix)
-          // If the call already existed (common with fixed callId), getOrCreate might NOT update members.
-          // We force-add them here using updateCall (addMembers is not a function on Call object per error).
-          if (uniqueMembers.length > 1) {
-            try {
-              console.log('🔄 Ensuring all members are added via updateCall:', uniqueMembers);
-              await call.updateCall({ members: uniqueMembers });
-            } catch (addError) {
-              console.warn('⚠️ Note: Error updating call members:', addError);
-            }
-          }
-
-          // 5. DIAGNOSTICS
+          // 4. DIAGNOSTICS
           const membersList = await call.queryMembers({});
           console.log('👥 Final Member List (Server):', membersList);
 

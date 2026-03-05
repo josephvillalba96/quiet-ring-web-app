@@ -193,16 +193,27 @@ export function LobbyScreen(props: LobbyScreenProps) {
       return;
     }
 
+    let devicesSubscription: any = null;
+
     // Esperar a que el call tenga el estado inicializado
     const checkCallReady = () => {
       try {
         // Verificar si el call tiene los datos necesarios
         if (call.state && call.camera && call.microphone) {
-          setIsCallReady(true);
+          // Pre-cargar la lista de dispositivos para evitar el crash en MicrophoneManager.ts:149
+          if (!devicesSubscription) {
+            devicesSubscription = call.microphone.listDevices().subscribe((devices) => {
+              if (devices && devices.length >= 0) {
+                console.log('✅ Devices enumerated, lobby ready');
+                setIsCallReady(true);
+              }
+            });
+          }
         } else {
           setIsCallReady(false);
         }
-      } catch {
+      } catch (e) {
+        console.warn('⚠️ Error checking call readiness:', e);
         setIsCallReady(false);
       }
     };
@@ -221,6 +232,9 @@ export function LobbyScreen(props: LobbyScreenProps) {
     return () => {
       clearInterval(interval);
       clearTimeout(timeout);
+      if (devicesSubscription) {
+        devicesSubscription.unsubscribe();
+      }
     };
   }, [call]);
 

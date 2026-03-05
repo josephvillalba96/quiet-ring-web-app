@@ -1,3 +1,4 @@
+import { forwardRef } from "react";
 import { useParticipantViewContext, VideoPlaceholderProps } from "@stream-io/video-react-sdk";
 
 export const VerticalParticipantViewUI = () => {
@@ -52,22 +53,24 @@ export const MinimalParticipantViewUI = () => {
     );
 };
 
-export const VerticalVideoPlaceholder = ({ style }: VideoPlaceholderProps) => {
-    const { participant } = useParticipantViewContext();
+export const VerticalVideoPlaceholder = forwardRef<HTMLDivElement, VideoPlaceholderProps>(
+    ({ style }, ref) => {
+        const { participant } = useParticipantViewContext();
 
-    return (
-        <div className="vertical-placeholder" style={style}>
-            <div className="placeholder-avatar-large">
-                {participant.image ? (
-                    <img src={participant.image} alt="" />
-                ) : (
-                    <span className="initials">
-                        {(participant.name || participant.userId).slice(0, 2).toUpperCase()}
-                    </span>
-                )}
+        return (
+            <div className="vertical-placeholder" style={style} ref={ref}>
+                <div className="placeholder-avatar-large">
+                    {participant.image ? (
+                        <img src={participant.image} alt="" />
+                    ) : (
+                        <span className="initials">
+                            {(participant.name || participant.userId).slice(0, 2).toUpperCase()}
+                        </span>
+                    )}
+                </div>
+                <p className="placeholder-text">{participant.name || participant.userId}</p>
+                <p className="placeholder-subtext">Cámara apagada</p>
             </div>
-            <p className="placeholder-text">{participant.name || participant.userId}</p>
-            <p className="placeholder-subtext">Cámara apagada</p>
-        </div>
-    );
-};
+        );
+    }
+);
